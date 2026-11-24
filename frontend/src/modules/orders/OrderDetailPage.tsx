@@ -15,6 +15,7 @@ import {
   Printer,
   RefreshCw,
   Ribbon,
+  Table as TableIcon,
   Truck,
   XCircle,
 } from "lucide-react";
@@ -38,13 +39,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { FormField } from "@/components/forms/FormField";
-import { formatDateTimeIST } from "@/lib/utils";
+import { cn, formatDateTimeIST } from "@/lib/utils";
 import { getOrderStatusBadgeVariant } from "@/modules/orders/OrdersListPage";
 import { OrderItemProductionPanel } from "@/modules/production/OrderItemProductionPanel";
 import {
   ItemWorkflowProgress,
   resolveItemNextAction,
 } from "@/modules/orders/ItemWorkflowProgress";
+import { OrderItemWorkflowTable } from "@/modules/orders/OrderItemWorkflowTable";
 import type { OrderItemRecord } from "@/types/orders";
 
 type OrderDetailView = "workflow" | "history";
@@ -64,6 +66,9 @@ export function OrderDetailPage(): React.ReactElement {
   const [activeView, setActiveView] = React.useState<OrderDetailView>(
     initialTab === "history" ? "history" : "workflow",
   );
+
+  // Workflow display layout: "table" (checklist table default) or "cards"
+  const [workflowLayout, setWorkflowLayout] = React.useState<"table" | "cards">("table");
 
   // Set of item line numbers that have their inline production panel expanded
   const [expandedItemLines, setExpandedItemLines] = React.useState<Record<number, boolean>>(() => {
@@ -530,24 +535,73 @@ export function OrderDetailPage(): React.ReactElement {
           </Button>
         </div>
 
-        {order.production_progress ? (
-          <span className="hidden text-xs font-medium text-slate-600 sm:inline-block">
-            {order.production_progress.summary_label}
-          </span>
-        ) : null}
+        <div className="flex items-center gap-3">
+          {order.production_progress ? (
+            <span className="hidden text-xs font-medium text-slate-600 sm:inline-block">
+              {order.production_progress.summary_label}
+            </span>
+          ) : null}
+
+          {/* Toggle between Table Checklist (default) and Cards */}
+          {activeView === "workflow" ? (
+            <div className="flex items-center rounded-lg border border-slate-200 bg-slate-100 p-0.5 select-none">
+              <button
+                type="button"
+                onClick={() => setWorkflowLayout("table")}
+                className={cn(
+                  "flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-[6px] transition-colors",
+                  workflowLayout === "table"
+                    ? "bg-white text-blue-700 shadow-xs"
+                    : "text-slate-600 hover:text-slate-900",
+                )}
+                title="Switch to Table Checklist view"
+              >
+                <TableIcon className="h-3.5 w-3.5" />
+                <span>Table Checklist</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setWorkflowLayout("cards")}
+                className={cn(
+                  "flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-[6px] transition-colors",
+                  workflowLayout === "cards"
+                    ? "bg-white text-blue-700 shadow-xs"
+                    : "text-slate-600 hover:text-slate-900",
+                )}
+                title="Switch to Cards view"
+              >
+                <LayoutList className="h-3.5 w-3.5" />
+                <span>Cards</span>
+              </button>
+            </div>
+          ) : null}
+        </div>
       </div>
 
-      {/* 4. PRIMARY WORKFLOW WORKSPACE: ITEM-BY-ITEM CARDS */}
+      {/* 4. PRIMARY WORKFLOW WORKSPACE: TABLE CHECKLIST (DEFAULT) OR CARDS */}
       {activeView === "workflow" ? (
-        <div className="space-y-4">
-          {order.items.map((item) => {
-            const isCard = item.category === "id_card";
-            const isLanyard = item.category === "lanyard";
-            const job = item.production_job;
-            const isExpanded = Boolean(expandedItemLines[item.line_number]);
+        workflowLayout === "table" ? (
+          <OrderItemWorkflowTable
+            order={order}
+            expandedItemLines={expandedItemLines}
+            onToggleItemExpansion={toggleItemExpansion}
+            onOpenDispatchModal={(item) => {
+              setEditingItem(item);
+              setEditDispatchedQty(item.dispatched_quantity);
+              setItemQtyError(null);
+            }}
+            isCancelled={isCancelled}
+          />
+        ) : (
+          <div className="space-y-4">
+            {order.items.map((item) => {
+              const isCard = item.category === "id_card";
+              const isLanyard = item.category === "lanyard";
+              const job = item.production_job;
+              const isExpanded = Boolean(expandedItemLines[item.line_number]);
 
-            const nextAction = resolveItemNextAction(
-              item.category,
+              const nextAction = resolveItemNextAction(
+                item.category,
               job,
               item.ordered_quantity,
               item.dispatched_quantity,
@@ -725,7 +779,8 @@ export function OrderDetailPage(): React.ReactElement {
             );
           })}
         </div>
-      ) : null}
+      )
+    ) : null}
 
       {/* 5. SECONDARY WORKSPACE: ORDER HISTORY & REPLACEMENTS */}
       {activeView === "history" ? (

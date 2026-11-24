@@ -91,6 +91,9 @@ test.describe("Pro Office Phase 3 End-to-End Browser Smoke Suite", () => {
     await page.getByTestId("order-tab-overview").click();
     await expect(page.getByText(/Partially Completed \(1\/3 Items Ready\)/i)).toBeVisible();
 
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(500);
+
     await page.screenshot({
       path: path.join(ARTIFACT_DIR, "order_table_checklist_view.png"),
       fullPage: true,

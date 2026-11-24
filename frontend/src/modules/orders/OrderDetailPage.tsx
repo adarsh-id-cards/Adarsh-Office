@@ -457,52 +457,62 @@ export function OrderDetailPage(): React.ReactElement {
         </div>
       ) : null}
 
-      {/* 2. COMPACT SUMMARY STRIP */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-[8px] border border-slate-200 bg-white p-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-            {isReplacement ? "Replacement Qty" : "Ordered Qty"}
-          </p>
-          <p className="mt-1 font-mono text-lg font-bold text-slate-900">
-            {order.total_ordered_quantity.toLocaleString("en-IN")}{" "}
-            <span className="text-xs font-normal text-slate-500">pcs</span>
-          </p>
-          <p className="text-[11px] text-slate-500">{order.items.length} item(s)</p>
-        </div>
+      {/* 2. UNIFIED METRICS STRIP */}
+      <div className="rounded-xl border border-slate-200/90 bg-white p-3.5 sm:p-4 shadow-xs">
+        <div className="grid grid-cols-2 divide-y divide-slate-100 sm:grid-cols-4 sm:divide-x sm:divide-y-0">
+          <div className="p-2 sm:px-4 sm:first:pl-0">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              {isReplacement ? "Replacement Qty" : "Ordered Quantity"}
+            </p>
+            <div className="mt-1 flex items-baseline gap-1">
+              <span className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 tabular-nums">
+                {order.total_ordered_quantity.toLocaleString("en-IN")}
+              </span>
+              <span className="text-xs font-normal text-slate-500">pcs</span>
+            </div>
+            <p className="mt-0.5 text-xs text-slate-500">{order.items.length} item line(s)</p>
+          </div>
 
-        <div className="rounded-[8px] border border-slate-200 bg-white p-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-            Produced / Ready
-          </p>
-          <p className="mt-1 font-mono text-lg font-bold text-blue-800">
-            {order.total_prepared_quantity.toLocaleString("en-IN")}{" "}
-            <span className="text-xs font-normal text-slate-500">pcs</span>
-          </p>
-          <p className="text-[11px] text-slate-500">
-            {order.production_progress?.production_completed_items ?? 0} of {order.items.length} items ready
-          </p>
-        </div>
+          <div className="p-2 sm:px-4">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Produced / Ready
+            </p>
+            <div className="mt-1 flex items-baseline gap-1">
+              <span className="text-xl sm:text-2xl font-bold tracking-tight text-blue-700 tabular-nums">
+                {order.total_prepared_quantity.toLocaleString("en-IN")}
+              </span>
+              <span className="text-xs font-normal text-slate-500">pcs</span>
+            </div>
+            <p className="mt-0.5 text-xs text-slate-500">
+              {order.production_progress?.production_completed_items ?? 0} of {order.items.length} items ready
+            </p>
+          </div>
 
-        <div className="rounded-[8px] border border-slate-200 bg-white p-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-            Dispatched
-          </p>
-          <p className="mt-1 font-mono text-lg font-bold text-emerald-800">
-            {order.total_dispatched_quantity.toLocaleString("en-IN")}{" "}
-            <span className="text-xs font-normal text-slate-500">pcs</span>
-          </p>
-          <p className="text-[11px] text-slate-500">Sent to client</p>
-        </div>
+          <div className="p-2 sm:px-4">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Dispatched
+            </p>
+            <div className="mt-1 flex items-baseline gap-1">
+              <span className="text-xl sm:text-2xl font-bold tracking-tight text-emerald-700 tabular-nums">
+                {order.total_dispatched_quantity.toLocaleString("en-IN")}
+              </span>
+              <span className="text-xs font-normal text-slate-500">pcs</span>
+            </div>
+            <p className="mt-0.5 text-xs text-slate-500">Sent to client</p>
+          </div>
 
-        <div className="rounded-[8px] border border-slate-200 bg-white p-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-            Remaining to Ship
-          </p>
-          <p className="mt-1 font-mono text-lg font-bold text-slate-800">
-            {order.total_remaining_quantity.toLocaleString("en-IN")}{" "}
-            <span className="text-xs font-normal text-slate-500">pcs</span>
-          </p>
-          <p className="text-[11px] text-slate-500">Balance quantity</p>
+          <div className="p-2 sm:px-4 sm:last:pr-0">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Remaining Balance
+            </p>
+            <div className="mt-1 flex items-baseline gap-1">
+              <span className="text-xl sm:text-2xl font-bold tracking-tight text-slate-700 tabular-nums">
+                {order.total_remaining_quantity.toLocaleString("en-IN")}
+              </span>
+              <span className="text-xs font-normal text-slate-500">pcs</span>
+            </div>
+            <p className="mt-0.5 text-xs text-slate-500">To be shipped</p>
+          </div>
         </div>
       </div>
 

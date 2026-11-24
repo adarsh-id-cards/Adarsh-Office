@@ -31,13 +31,13 @@ export const useUiShellStore = create<UiShellState>((set) => ({
   addToast: (toast) => {
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     set((state) => ({
-      toasts: [...state.toasts, { ...toast, id }],
+      toasts: [...state.toasts.slice(-2), { ...toast, id }],
     }));
     setTimeout(() => {
       set((state) => ({
         toasts: state.toasts.filter((item) => item.id !== id),
       }));
-    }, 4500);
+    }, 3200);
   },
   dismissToast: (id: string) =>
     set((state) => ({

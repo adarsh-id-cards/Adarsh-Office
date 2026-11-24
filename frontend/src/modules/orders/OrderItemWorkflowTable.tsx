@@ -122,24 +122,42 @@ export function OrderItemWorkflowTable({
   });
 
   return (
-    <div className="rounded-[10px] border border-slate-200 bg-white shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
-        <Table className="min-w-[900px] w-full">
-          <TableHeader>
-            <TableRow className="bg-slate-50 border-b border-slate-200">
-              <TableHead className="w-12 text-center text-xs font-bold text-slate-700">#</TableHead>
-              <TableHead className="min-w-[200px] text-xs font-bold text-slate-700">Item &amp; Specifications</TableHead>
-              <TableHead className="w-24 text-right text-xs font-bold text-slate-700">Ordered</TableHead>
-              <TableHead className="w-24 text-right text-xs font-bold text-slate-700">Produced</TableHead>
-              <TableHead className="w-24 text-right text-xs font-bold text-slate-700">Dispatched</TableHead>
-              <TableHead className="w-36 text-center text-xs font-bold text-slate-700">1. Design</TableHead>
-              <TableHead className="w-36 text-center text-xs font-bold text-slate-700">2. Printing</TableHead>
-              <TableHead className="w-36 text-center text-xs font-bold text-slate-700">3. Assembly</TableHead>
-              <TableHead className="w-36 text-center text-xs font-bold text-slate-700">4. Dispatch</TableHead>
-              <TableHead className="w-32 text-right text-xs font-bold text-slate-700">Details</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+    <Table className="w-full rounded-xl border border-slate-200/90 bg-white shadow-xs">
+      <TableHeader>
+        <TableRow className="bg-slate-50/70 border-b border-slate-200">
+          <TableHead className="w-10 px-2 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            #
+          </TableHead>
+          <TableHead className="min-w-[170px] px-2.5 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            Item &amp; Specifications
+          </TableHead>
+          <TableHead className="w-16 px-2 text-right text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            Ordered
+          </TableHead>
+          <TableHead className="w-16 px-2 text-right text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            Ready
+          </TableHead>
+          <TableHead className="w-16 px-2 text-right text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            Shipped
+          </TableHead>
+          <TableHead className="w-24 px-2 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            1. Design
+          </TableHead>
+          <TableHead className="w-24 px-2 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            2. Printing
+          </TableHead>
+          <TableHead className="w-24 px-2 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            3. Assembly
+          </TableHead>
+          <TableHead className="w-24 px-2 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            4. Dispatch
+          </TableHead>
+          <TableHead className="w-20 px-2 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            Details
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
             {order.items.map((item) => {
               const isCard = item.category === "id_card";
               const isLanyard = item.category === "lanyard";
@@ -160,33 +178,43 @@ export function OrderItemWorkflowTable({
               const isDispatched =
                 item.dispatched_quantity >= item.ordered_quantity && item.ordered_quantity > 0;
 
+              // Compute stages complete count for mini-progress indicator
+              const totalStages = isLanyard ? 4 : 3;
+              let stagesDone = 0;
+              if (isDesignDone) stagesDone++;
+              if (isPrintingDone) stagesDone++;
+              if (isLanyard && isAssemblyDone) stagesDone++;
+              if (isDispatched) stagesDone++;
+
               return (
                 <React.Fragment key={item.id}>
-                  <TableRow className={cn(
-                    "transition-colors hover:bg-slate-50/80 border-b border-slate-100",
-                    isExpanded && "bg-blue-50/20"
-                  )}>
+                  <TableRow
+                    className={cn(
+                      "transition-colors hover:bg-slate-50/70 border-b border-slate-100",
+                      isExpanded && "bg-blue-50/25 border-l-4 border-l-blue-600",
+                    )}
+                  >
                     {/* Line # */}
-                    <TableCell className="text-center font-bold text-slate-600">
-                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-800">
+                    <TableCell className="w-10 px-2 text-center">
+                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-700">
                         {item.line_number}
                       </span>
                     </TableCell>
 
-                    {/* Item Name & Specs */}
-                    <TableCell>
-                      <div className="space-y-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-slate-900 text-[13.5px]">
+                    {/* Item Name, Badge & Specs */}
+                    <TableCell className="px-2.5">
+                      <div className="space-y-1">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="font-semibold text-slate-900 text-sm">
                             {item.item_name}
                           </span>
                           <Badge
                             variant="neutral"
                             className={cn(
-                              "text-[10px] px-1.5 py-0 h-4 font-medium",
+                              "text-[10px] px-1.5 py-0 h-4 font-semibold",
                               isCard
-                                ? "bg-blue-50 text-blue-700 border-blue-200"
-                                : "bg-purple-50 text-purple-700 border-purple-200",
+                                ? "bg-indigo-50 text-indigo-700 border-indigo-200/80"
+                                : "bg-purple-50 text-purple-700 border-purple-200/80",
                             )}
                           >
                             {isCard ? (
@@ -197,46 +225,55 @@ export function OrderItemWorkflowTable({
                             {isCard ? "ID Card" : "Lanyard"}
                           </Badge>
                         </div>
-                        <p className="text-[11.5px] text-slate-500 truncate max-w-[260px]">
-                          {isCard ? (
-                            <>
-                              {item.card_orientation_label} &bull; {item.card_printing_label}
-                              {item.holder_requirement !== "not_selected" &&
-                                item.holder_requirement !== "not_required" &&
-                                ` • ${item.holder_requirement_label}`}
-                            </>
-                          ) : (
-                            <>
-                              {item.lanyard_size_option_detail?.name || "16 mm"}
-                              {item.hook_requirement !== "not_required" &&
-                                item.hook_requirement !== "not_selected" &&
-                                ` • ${item.hook_requirement_label}`}
-                            </>
-                          )}
-                        </p>
+
+                        <div className="flex items-center gap-2 text-xs text-slate-500">
+                          <span className="truncate max-w-[220px]">
+                            {isCard ? (
+                              <>
+                                {item.card_orientation_label} &bull; {item.card_printing_label}
+                                {item.holder_requirement !== "not_selected" &&
+                                  item.holder_requirement !== "not_required" &&
+                                  ` • ${item.holder_requirement_label}`}
+                              </>
+                            ) : (
+                              <>
+                                {item.lanyard_size_option_detail?.name || "16 mm"}
+                                {item.hook_requirement !== "not_required" &&
+                                  item.hook_requirement !== "not_selected" &&
+                                  ` • ${item.hook_requirement_label}`}
+                              </>
+                            )}
+                          </span>
+                          <span className="text-slate-300">&bull;</span>
+                          <span className="text-[11px] font-medium text-slate-600">
+                            {stagesDone}/{totalStages} done
+                          </span>
+                        </div>
                       </div>
                     </TableCell>
 
                     {/* Ordered Qty */}
-                    <TableCell className="text-right font-mono font-semibold text-slate-900 text-[13px]">
+                    <TableCell className="w-16 px-2 text-right tabular-nums font-semibold text-slate-900 text-[13px]">
                       {item.ordered_quantity.toLocaleString("en-IN")}
                     </TableCell>
 
                     {/* Produced Qty */}
-                    <TableCell className="text-right font-mono font-bold text-blue-800 text-[13px]">
+                    <TableCell className="w-16 px-2 text-right tabular-nums font-bold text-blue-700 text-[13px]">
                       {item.prepared_quantity.toLocaleString("en-IN")}
                     </TableCell>
 
                     {/* Dispatched Qty */}
-                    <TableCell className="text-right font-mono font-bold text-emerald-800 text-[13px]">
+                    <TableCell className="w-16 px-2 text-right tabular-nums font-bold text-emerald-700 text-[13px]">
                       {item.dispatched_quantity.toLocaleString("en-IN")}
                     </TableCell>
 
                     {/* 1. Design Column */}
-                    <TableCell className="text-center">
+                    <TableCell className="w-24 px-2 text-center">
                       {isDesignDone ? (
-                        <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[11.5px] font-semibold text-emerald-800 select-none">
-                          <Check className="h-3 w-3 stroke-[3] text-emerald-600" />
+                        <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800 shadow-2xs select-none">
+                          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-600 text-white">
+                            <Check className="h-2.5 w-2.5 stroke-[3]" />
+                          </span>
                           <span>Approved</span>
                         </div>
                       ) : job ? (
@@ -244,47 +281,55 @@ export function OrderItemWorkflowTable({
                           type="button"
                           onClick={() => approveDesignMutation.mutate({ jobId: job.id })}
                           disabled={approveDesignMutation.isPending || isCancelled}
-                          className="group inline-flex items-center gap-1.5 rounded-[6px] border border-slate-300 bg-white px-2 py-1 text-[11.5px] font-medium text-slate-700 shadow-sm transition hover:border-blue-600 hover:bg-blue-50/70 hover:text-blue-900 active:scale-95 disabled:opacity-50"
+                          className="group inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-white px-2 py-0.5 text-xs font-medium text-slate-700 shadow-2xs transition-all hover:border-blue-600 hover:bg-blue-50/80 hover:text-blue-900 active:scale-95 disabled:opacity-50"
                           title="Click checkbox to mark Design as Approved"
                         >
-                          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-[3px] border border-slate-400 bg-white transition group-hover:border-blue-600 group-hover:bg-blue-100" />
-                          <span>{job.design_status === "in_progress" ? "Approve Design" : "Start & Approve"}</span>
+                          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-slate-400 bg-white transition group-hover:border-blue-600 group-hover:bg-blue-100">
+                            <Check className="h-2 w-2 stroke-[2] opacity-0 group-hover:opacity-100 text-blue-700 transition-opacity" />
+                          </span>
+                          <span>{job.design_status === "in_progress" ? "Approve" : "Mark Done"}</span>
                         </button>
                       ) : (
-                        <span className="text-[11px] text-slate-400 italic">Pending</span>
+                        <span className="text-xs text-slate-300 select-none">—</span>
                       )}
                     </TableCell>
 
                     {/* 2. Printing Column */}
-                    <TableCell className="text-center">
+                    <TableCell className="w-24 px-2 text-center">
                       {isPrintingDone ? (
-                        <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[11.5px] font-semibold text-emerald-800 select-none">
-                          <Check className="h-3 w-3 stroke-[3] text-emerald-600" />
+                        <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800 shadow-2xs select-none">
+                          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-600 text-white">
+                            <Check className="h-2.5 w-2.5 stroke-[3]" />
+                          </span>
                           <span>Printed</span>
                         </div>
                       ) : !isDesignDone ? (
-                        <span className="text-[11px] text-slate-400 italic">Awaiting Design</span>
+                        <span className="text-xs text-slate-300 select-none">—</span>
                       ) : isCard && isReadyForDispatch ? (
-                        <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[11.5px] font-semibold text-emerald-800 select-none">
-                          <Check className="h-3 w-3 stroke-[3] text-emerald-600" />
-                          <span>Ready for Packing</span>
+                        <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800 shadow-2xs select-none">
+                          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-600 text-white">
+                            <Check className="h-2.5 w-2.5 stroke-[3]" />
+                          </span>
+                          <span>Ready</span>
                         </div>
                       ) : isCard && job ? (
                         <button
                           type="button"
                           onClick={() => completeIdCardMutation.mutate({ jobId: job.id, quantity: item.ordered_quantity })}
                           disabled={completeIdCardMutation.isPending || isCancelled}
-                          className="group inline-flex items-center gap-1.5 rounded-[6px] border border-slate-300 bg-white px-2 py-1 text-[11.5px] font-medium text-slate-700 shadow-sm transition hover:border-blue-600 hover:bg-blue-50/70 hover:text-blue-900 active:scale-95 disabled:opacity-50"
+                          className="group inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-white px-2 py-0.5 text-xs font-medium text-slate-700 shadow-2xs transition-all hover:border-blue-600 hover:bg-blue-50/80 hover:text-blue-900 active:scale-95 disabled:opacity-50"
                           title="Click to mark printing complete and ready for dispatch"
                         >
-                          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-[3px] border border-slate-400 bg-white transition group-hover:border-blue-600" />
+                          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-slate-400 bg-white transition group-hover:border-blue-600 group-hover:bg-blue-100">
+                            <Check className="h-2 w-2 stroke-[2] opacity-0 group-hover:opacity-100 text-blue-700 transition-opacity" />
+                          </span>
                           <span>Mark Printed</span>
                         </button>
                       ) : (
                         <button
                           type="button"
                           onClick={() => onToggleItemExpansion(item.line_number)}
-                          className="inline-flex items-center gap-1 rounded border border-blue-200 bg-blue-50/60 px-2 py-0.5 text-[11px] font-semibold text-blue-800 hover:bg-blue-100 transition"
+                          className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition shadow-2xs"
                         >
                           <Printer className="h-3 w-3" />
                           <span>Print Runs</span>
@@ -293,18 +338,20 @@ export function OrderItemWorkflowTable({
                     </TableCell>
 
                     {/* 3. Assembly Column */}
-                    <TableCell className="text-center">
+                    <TableCell className="w-24 px-2 text-center">
                       {!isLanyard ? (
-                        <span className="inline-block rounded bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-400 italic select-none">
+                        <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-400 select-none">
                           N/A (Cards)
                         </span>
                       ) : isAssemblyDone ? (
-                        <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[11.5px] font-semibold text-emerald-800 select-none">
-                          <Check className="h-3 w-3 stroke-[3] text-emerald-600" />
+                        <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800 shadow-2xs select-none">
+                          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-600 text-white">
+                            <Check className="h-2.5 w-2.5 stroke-[3]" />
+                          </span>
                           <span>Assembled</span>
                         </div>
                       ) : !isPrintingDone ? (
-                        <span className="text-[11px] text-slate-400 italic">Awaiting Print</span>
+                        <span className="text-xs text-slate-300 select-none">—</span>
                       ) : job ? (
                         <button
                           type="button"
@@ -315,22 +362,26 @@ export function OrderItemWorkflowTable({
                             })
                           }
                           disabled={completeAssemblyMutation.isPending || isCancelled}
-                          className="group inline-flex items-center gap-1.5 rounded-[6px] border border-slate-300 bg-white px-2 py-1 text-[11.5px] font-medium text-slate-700 shadow-sm transition hover:border-emerald-600 hover:bg-emerald-50/70 hover:text-emerald-900 active:scale-95 disabled:opacity-50"
+                          className="group inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-white px-2 py-0.5 text-xs font-medium text-slate-700 shadow-2xs transition-all hover:border-emerald-600 hover:bg-emerald-50/80 hover:text-emerald-900 active:scale-95 disabled:opacity-50"
                           title="Click checkbox to mark Assembly as Complete"
                         >
-                          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-[3px] border border-slate-400 bg-white transition group-hover:border-emerald-600 group-hover:bg-emerald-100" />
-                          <span>Mark Assembled</span>
+                          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-slate-400 bg-white transition group-hover:border-emerald-600 group-hover:bg-emerald-100">
+                            <Check className="h-2 w-2 stroke-[2] opacity-0 group-hover:opacity-100 text-emerald-700 transition-opacity" />
+                          </span>
+                          <span>Mark Done</span>
                         </button>
                       ) : (
-                        <span className="text-[11px] text-slate-400 italic">Pending</span>
+                        <span className="text-xs text-slate-300 select-none">—</span>
                       )}
                     </TableCell>
 
                     {/* 4. Dispatch Column */}
-                    <TableCell className="text-center">
+                    <TableCell className="w-24 px-2 text-center">
                       {isDispatched ? (
-                        <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[11.5px] font-semibold text-emerald-800 select-none">
-                          <Check className="h-3 w-3 stroke-[3] text-emerald-600" />
+                        <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800 shadow-2xs select-none">
+                          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-600 text-white">
+                            <Check className="h-2.5 w-2.5 stroke-[3]" />
+                          </span>
                           <span>Dispatched</span>
                         </div>
                       ) : isReadyForDispatch ? (
@@ -338,28 +389,31 @@ export function OrderItemWorkflowTable({
                           type="button"
                           onClick={() => onOpenDispatchModal(item)}
                           disabled={isCancelled}
-                          className="inline-flex items-center gap-1 rounded-[6px] border border-blue-400 bg-blue-50 px-2 py-1 text-[11.5px] font-semibold text-blue-800 shadow-sm transition hover:bg-blue-100 active:scale-95 disabled:opacity-50"
+                          className="inline-flex items-center gap-1 rounded-full border border-blue-400 bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-800 shadow-2xs transition hover:bg-blue-100 active:scale-95 disabled:opacity-50"
                         >
                           <Truck className="h-3 w-3 text-blue-600" />
-                          <span>{item.dispatched_quantity > 0 ? "Add Dispatch" : "Dispatch"}</span>
+                          <span>{item.dispatched_quantity > 0 ? `Ship (${item.dispatched_quantity})` : "Dispatch"}</span>
                         </button>
                       ) : (
-                        <span className="text-[11px] text-slate-400 italic">In Production</span>
+                        <span className="text-xs text-slate-300 select-none">—</span>
                       )}
                     </TableCell>
 
                     {/* Details Column with test ID preservation */}
-                    <TableCell className="text-right">
+                    <TableCell className="w-20 px-2 text-center">
                       {job ? (
                         <Button
                           size="sm"
-                          variant={isExpanded ? "default" : "outline"}
+                          variant={isExpanded ? "secondary" : "outline"}
                           onClick={() => onToggleItemExpansion(item.line_number)}
                           data-testid={`open-production-job-${item.line_number}`}
-                          className="h-7 px-2 text-[11.5px] font-medium gap-1"
+                          className={cn(
+                            "h-7 px-2.5 text-xs font-medium gap-1 rounded-[6px] transition-all",
+                            isExpanded && "bg-blue-50 text-blue-800 border-blue-300 font-semibold",
+                          )}
                         >
                           <Printer className="h-3 w-3" />
-                          <span>{isExpanded ? "Hide" : "Details"}</span>
+                          <span>{isExpanded ? "Close" : "Details"}</span>
                           <ChevronDown
                             className={cn(
                               "h-3 w-3 transition-transform",
@@ -373,10 +427,10 @@ export function OrderItemWorkflowTable({
 
                   {/* Expandable Detailed Production Workspace (Batch Calculator & Runs) */}
                   {isExpanded && job ? (
-                    <TableRow className="bg-slate-50/70 border-b border-slate-200">
+                    <TableRow className="bg-slate-50/50 border-b border-slate-200">
                       <TableCell colSpan={10} className="p-3.5 pt-2">
-                        <div className="rounded-[8px] border border-slate-200 bg-white p-3 shadow-sm animate-in fade-in-0 duration-200">
-                          <div className="mb-2.5 flex items-center justify-between border-b border-slate-100 pb-2">
+                        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm animate-in fade-in-0 duration-200">
+                          <div className="mb-3 flex items-center justify-between border-b border-slate-100 pb-2">
                             <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
                               {item.item_name} &bull; Detailed Production Tools
                             </span>
@@ -403,7 +457,5 @@ export function OrderItemWorkflowTable({
             })}
           </TableBody>
         </Table>
-      </div>
-    </div>
   );
 }

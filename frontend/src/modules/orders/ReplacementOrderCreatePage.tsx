@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import { clientService } from "@/services/clientService";
 import { orderService } from "@/services/orderService";
-import { phase4Service } from "@/services/phase4Service";
 import { ApiClientError } from "@/services/apiClient";
 import { useUiShellStore } from "@/hooks/useToastStore";
 import { Badge } from "@/components/ui/badge";
@@ -82,14 +81,13 @@ export function ReplacementOrderCreatePage(): React.ReactElement {
     enabled: Boolean(selectedOriginalOrderId),
   });
 
-  // 4. Fetch available Office Surplus Pool records for this client (Phase 4 Section 16)
-  const { data: clientSurplusData } = useQuery({
-    queryKey: ["surplus", "office", "for-client", selectedClientId],
-    queryFn: () =>
-      phase4Service.listOfficeSurplus({ client: selectedClientId, available_only: true }),
-    enabled: Boolean(selectedClientId),
-  });
-  const availableClientSurplus = clientSurplusData?.results || [];
+  // 4. Client surplus pool (placeholder for inventory branch integration)
+  const availableClientSurplus: Array<{
+    id: string;
+    surplus_code: string;
+    item_name: string;
+    remaining_quantity: number;
+  }> = [];
 
   // When originalOrderDetail loads, initialize selection state and sync client
   React.useEffect(() => {

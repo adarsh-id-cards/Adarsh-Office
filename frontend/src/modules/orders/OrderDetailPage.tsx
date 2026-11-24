@@ -14,12 +14,9 @@ import {
   Printer,
   RefreshCw,
   Ribbon,
-  Truck,
-  Wrench,
   XCircle,
 } from "lucide-react";
 import { orderService } from "@/services/orderService";
-import { productionService } from "@/services/productionService";
 import { ApiClientError } from "@/services/apiClient";
 import { useUiShellStore } from "@/hooks/useToastStore";
 import { Badge } from "@/components/ui/badge";
@@ -41,16 +38,12 @@ import { FormField } from "@/components/forms/FormField";
 import { formatDateTimeIST } from "@/lib/utils";
 import { getOrderStatusBadgeVariant } from "@/modules/orders/OrdersListPage";
 import { OrderItemProductionPanel } from "@/modules/production/OrderItemProductionPanel";
-import { AssemblyOperationsPanel } from "@/modules/production/AssemblyOperationsPanel";
-import { OrderDispatchPanel } from "@/modules/orders/OrderDispatchPanel";
 import type { OrderItemRecord, OrderStatus } from "@/types/orders";
 
 type OrderWorkspaceTab =
   | "overview"
   | "items"
   | "production"
-  | "assembly"
-  | "dispatch"
   | "history";
 
 const STATUS_DISPLAY_LABELS: Record<OrderStatus, string> = {
@@ -61,32 +54,6 @@ const STATUS_DISPLAY_LABELS: Record<OrderStatus, string> = {
   completed: "Completed",
   cancelled: "Cancelled",
 };
-
-function OrderAssemblyTabContent({
-  jobId,
-}: {
-  jobId: string;
-}): React.ReactElement {
-  const { data: job, isLoading } = useQuery({
-    queryKey: ["production", "job", jobId],
-    queryFn: () => productionService.getJob(jobId),
-    enabled: Boolean(jobId),
-  });
-
-  if (isLoading || !job) {
-    return (
-      <div className="py-8 text-center">
-        <Spinner label="Loading assembly assignments..." />
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      <AssemblyOperationsPanel job={job} />
-    </div>
-  );
-}
 
 export function OrderDetailPage(): React.ReactElement {
   const { orderId } = useParams<{ orderId: string }>();
@@ -269,16 +236,12 @@ export function OrderDetailPage(): React.ReactElement {
   }
 
   const isReplacement = order.order_type === "replacement";
-  const lanyardItems = order.items.filter((i) => i.category === "lanyard");
-  const hasLanyards = lanyardItems.length > 0;
   const nonCancelTransitions = order.allowed_transitions.filter(
     (st) => st !== "cancelled" && st !== "confirmed",
   );
 
   const selectedProdItem =
     order.items.find((i) => i.id === selectedItemId) || order.items[0];
-  const selectedAssemblyItem =
-    lanyardItems.find((i) => i.id === selectedItemId) || lanyardItems[0];
 
   const tabs: Array<{
     key: OrderWorkspaceTab;
@@ -289,8 +252,6 @@ export function OrderDetailPage(): React.ReactElement {
     { key: "overview", label: "Overview", icon: LayoutList },
     { key: "items", label: `Items (${order.items.length})`, icon: CreditCard },
     { key: "production", label: "Production", icon: Printer },
-    { key: "assembly", label: "Labour & Assembly", icon: Wrench, hidden: !hasLanyards },
-    { key: "dispatch", label: "Packing & Dispatch", icon: Truck },
     { key: "history", label: "History", icon: History },
   ];
 
@@ -609,24 +570,6 @@ export function OrderDetailPage(): React.ReactElement {
                                 Production
                               </Button>
                             ) : null}
-                            {!isCard && pj ? (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => switchTab("assembly", item.id)}
-                              >
-                                <Wrench className="h-3.5 w-3.5" />
-                                Assembly
-                              </Button>
-                            ) : null}
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => switchTab("dispatch", item.id)}
-                            >
-                              <Truck className="h-3.5 w-3.5" />
-                              Dispatch
-                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -851,46 +794,7 @@ export function OrderDetailPage(): React.ReactElement {
         </div>
       ) : null}
 
-      {/* TAB 4: LABOUR & ASSEMBLY (Lanyard Items Only) */}
-      {activeTab === "assembly" && hasLanyards && selectedAssemblyItem ? (
-        <div className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white p-3">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="mr-1 text-xs font-medium text-slate-500">Lanyard Item:</span>
-              {lanyardItems.map((item) => (
-                <Button
-                  key={item.id}
-                  size="sm"
-                  variant={selectedAssemblyItem.id === item.id ? "default" : "outline"}
-                  onClick={() => switchTab("assembly", item.id)}
-                >
-                  #{item.line_number} {item.item_name} (
-                  {item.ordered_quantity.toLocaleString("en-IN")})
-                </Button>
-              ))}
-            </div>
-            <Link to="/labour" className="text-xs font-medium text-blue-700 hover:underline">
-              Open Labour &amp; Machines Directory &rarr;
-            </Link>
-          </div>
-
-          {selectedAssemblyItem.production_job ? (
-            <OrderAssemblyTabContent jobId={selectedAssemblyItem.production_job.id} />
-          ) : null}
-        </div>
-      ) : null}
-
-      {/* TAB 5: PACKING & DISPATCH */}
-      {activeTab === "dispatch" ? (
-        <OrderDispatchPanel
-          orderId={order.id}
-          orderNumber={order.order_number}
-          clientId={order.client}
-          isCancelled={order.status === "cancelled"}
-        />
-      ) : null}
-
-      {/* TAB 6: HISTORY & REPLACEMENTS */}
+      {/* TAB 4: HISTORY & REPLACEMENTS */}
       {activeTab === "history" ? (
         <div className="grid gap-6 lg:grid-cols-2">
           {!isReplacement ? (

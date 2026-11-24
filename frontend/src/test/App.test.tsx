@@ -64,27 +64,9 @@ vi.mock("@/services/productionService", () => ({
       under_design: 0,
       awaiting_printing: 0,
       currently_printing: 0,
-      lanyards_ready_for_assembly: 0,
       incomplete_production: 0,
-      ready_for_dispatch: 0,
     }),
     listQueue: vi.fn().mockResolvedValue({ count: 0, next: null, previous: null, page_size: 25, results: [] }),
-  },
-}));
-
-vi.mock("@/services/phase4Service", () => ({
-  phase4Service: {
-    listMaterials: vi.fn().mockResolvedValue({ count: 0, next: null, previous: null, page_size: 25, results: [] }),
-    listBalances: vi.fn().mockResolvedValue([]),
-    listMovements: vi.fn().mockResolvedValue({ count: 0, next: null, previous: null, page_size: 50, results: [] }),
-    getConsumptionSummary: vi.fn().mockResolvedValue([]),
-    listDefects: vi.fn().mockResolvedValue([]),
-    listLabourers: vi.fn().mockResolvedValue({ results: [] }),
-    listAssignments: vi.fn().mockResolvedValue({ results: [] }),
-    listAudits: vi.fn().mockResolvedValue({ results: [] }),
-    getAssemblyQueue: vi.fn().mockResolvedValue({ results: [] }),
-    getDispatchQueue: vi.fn().mockResolvedValue({ results: [] }),
-    reconcileInventory: vi.fn().mockResolvedValue({ all_reconciled: true, checked_pairs: 0, results: [] }),
   },
 }));
 
@@ -105,16 +87,6 @@ const mockAdminUser: AuthUser = {
     "orders.manage",
     "production.view",
     "production.manage",
-    "dispatch.view",
-    "dispatch.manage",
-    "labour.view",
-    "labour.manage",
-    "machines.view",
-    "machines.manage",
-    "inventory.view",
-    "inventory.manage",
-    "stock_audit.view",
-    "stock_audit.manage",
     "users.view",
     "audit_logs.view",
   ],
@@ -186,7 +158,7 @@ describe("Pro Office Application Shell & Phase 3-4 Placeholders", () => {
     expect(screen.getByLabelText(/Username or Work Email/i)).toBeInTheDocument();
   });
 
-  it("renders redesigned workflow dashboard, 4 primary sidebar modules, and secondary administration", async () => {
+  it("renders workflow dashboard, primary client and order modules, and secondary administration", async () => {
     vi.mocked(authService.getCurrentUser).mockResolvedValue(mockAdminUser);
 
     renderWithRouter(["/dashboard"]);
@@ -197,22 +169,22 @@ describe("Pro Office Application Shell & Phase 3-4 Placeholders", () => {
 
     expect(screen.getByTestId("qa-new-order")).toBeInTheDocument();
     expect(screen.getByTestId("qa-add-client")).toBeInTheDocument();
-    expect(screen.getByTestId("qa-assign-labour")).toBeInTheDocument();
-    expect(screen.getByTestId("qa-stock-in")).toBeInTheDocument();
+    expect(screen.getByTestId("qa-new-replacement")).toBeInTheDocument();
+    expect(screen.getByTestId("qa-production")).toBeInTheDocument();
 
     expect(screen.getByText("Active Orders")).toBeInTheDocument();
-    expect(screen.getByText("Orders in Production")).toBeInTheDocument();
-    expect(screen.getByText("Pending Assembly")).toBeInTheDocument();
-    expect(screen.getByText("Ready for Dispatch")).toBeInTheDocument();
+    expect(screen.getByText("Registered Clients")).toBeInTheDocument();
+    expect(screen.getByText("Jobs in Production")).toBeInTheDocument();
+    expect(screen.getByText("Completed Orders")).toBeInTheDocument();
 
     expect(screen.queryByText(/Notifications \(Planned\)/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Application & Infrastructure Health/i)).not.toBeInTheDocument();
 
-    // Primary nav uses Clients, Orders, Labour, Stock cleanly; System Health moved to Settings
+    // Primary nav uses Clients and Orders cleanly; System Health moved to Settings
     expect(screen.getAllByRole("link", { name: /^Clients$/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole("link", { name: /^Orders$/i }).length).toBeGreaterThan(0);
-    expect(screen.getAllByRole("link", { name: /^Labour$/i }).length).toBeGreaterThan(0);
-    expect(screen.getAllByRole("link", { name: /^Stock$/i }).length).toBeGreaterThan(0);
+    expect(screen.queryByRole("link", { name: /^Labour$/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /^Stock$/i })).not.toBeInTheDocument();
     expect(screen.getAllByText("Administration").length).toBeGreaterThan(0);
   });
 
@@ -222,7 +194,7 @@ describe("Pro Office Application Shell & Phase 3-4 Placeholders", () => {
       role: "office_worker",
       role_label: "Office Worker",
       is_owner_admin: false,
-      permissions: ["dashboard.view", "clients.view", "orders.view", "labour.view", "inventory.view"],
+      permissions: ["dashboard.view", "clients.view", "orders.view", "production.view"],
     });
 
     renderWithRouter(["/system/settings"]);
@@ -232,16 +204,15 @@ describe("Pro Office Application Shell & Phase 3-4 Placeholders", () => {
     expect(screen.queryByRole("link", { name: /^Activity Logs$/i })).not.toBeInTheDocument();
   });
 
-  it("routes /inventory and /stock to unified Stock Management without placeholder stubs", async () => {
+  it("routes /orders/new and renders multi-item order creation form", async () => {
     vi.mocked(authService.getCurrentUser).mockResolvedValue(mockAdminUser);
 
-    renderWithRouter(["/inventory"]);
+    renderWithRouter(["/orders/new"]);
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: /Stock Management/i })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /Create New Order/i })).toBeInTheDocument();
     });
-    expect(screen.getByTestId("inventory-tab-audits")).toBeInTheDocument();
-    expect(screen.queryByText(/Module Not Yet Implemented/i)).not.toBeInTheDocument();
+    expect(screen.getByTestId("submit-create-order-btn")).toBeInTheDocument();
   });
 
   it("completes login form submission and transitions to dashboard", async () => {

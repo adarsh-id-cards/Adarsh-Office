@@ -35,7 +35,7 @@ def env_list(name: str, default: list[str] | None = None) -> list[str]:
 
 
 PROJECT_NAME = os.getenv("PROJECT_NAME", "pro-office")
-APP_VERSION = "1.3.0-phase4"
+APP_VERSION = "1.2.0-orders-clients"
 
 SECRET_KEY = os.getenv(
     "DJANGO_SECRET_KEY",
@@ -71,12 +71,6 @@ LOCAL_APPS = [
     "apps.clients",
     "apps.orders",
     "apps.production",
-    "apps.labour",
-    "apps.machines",
-    "apps.inventory",
-    "apps.assembly",
-    "apps.stock_audit",
-    "apps.dispatch",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

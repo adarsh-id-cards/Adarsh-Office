@@ -12,10 +12,6 @@ import { ReplacementOrderCreatePage } from "@/modules/orders/ReplacementOrderCre
 import { OrderDetailPage } from "@/modules/orders/OrderDetailPage";
 import { ProductionDashboardPage } from "@/modules/production/ProductionDashboardPage";
 import { ProductionJobDetailPage } from "@/modules/production/ProductionJobDetailPage";
-import { LabourPage } from "@/modules/labour/LabourPage";
-import { LabourerDetailPage } from "@/modules/labour/LabourerDetailPage";
-import { InventoryPage } from "@/modules/inventory/InventoryPage";
-import { DispatchPage } from "@/modules/dispatch/DispatchPage";
 import { UsersPage } from "@/modules/system/UsersPage";
 import { ActivityLogsPage } from "@/modules/system/ActivityLogsPage";
 import { SettingsPage } from "@/modules/system/SettingsPage";
@@ -40,20 +36,9 @@ export function AppRouter(): React.ReactElement {
           <Route path="/orders/replacements/new" element={<ReplacementOrderCreatePage />} />
           <Route path="/orders/:orderId" element={<OrderDetailPage />} />
 
-          {/* Direct Production & Dispatch Permalinks (Backward Compatible) */}
+          {/* Direct Production Permalinks */}
           <Route path="/production" element={<ProductionDashboardPage />} />
           <Route path="/production/jobs/:jobId" element={<ProductionJobDetailPage />} />
-          <Route path="/dispatch" element={<DispatchPage />} />
-
-          {/* Primary Module C: Labour (includes embedded Machines tab) */}
-          <Route path="/labour" element={<LabourPage />} />
-          <Route path="/labour/:labourerId" element={<LabourerDetailPage />} />
-          <Route path="/machines" element={<LabourPage defaultTab="machines" />} />
-
-          {/* Primary Module D: Stock (includes embedded Stock Audits tab) */}
-          <Route path="/stock" element={<InventoryPage />} />
-          <Route path="/inventory" element={<InventoryPage />} />
-          <Route path="/stock-audit" element={<InventoryPage defaultTab="audits" />} />
 
           {/* Secondary Navigation: Administration */}
           <Route path="/system/settings" element={<SettingsPage />} />

@@ -32,7 +32,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { FormField } from "@/components/forms/FormField";
-import { AssemblyOperationsPanel } from "@/modules/production/AssemblyOperationsPanel";
 import { formatDateTimeIST } from "@/lib/utils";
 import {
   getAssemblyBadgeVariant,
@@ -787,8 +786,6 @@ export function OrderItemProductionPanel({
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <AssemblyOperationsPanel job={job} />
-
             <div className="grid gap-3 rounded-md border border-slate-200 bg-white p-3 text-xs sm:grid-cols-4">
               <div>
                 <span className="text-slate-500">Readiness:</span>{" "}

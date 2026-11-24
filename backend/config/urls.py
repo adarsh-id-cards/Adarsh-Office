@@ -15,15 +15,6 @@ api_v1_patterns = [
     path("order-items/", include("apps.orders.item_urls")),
     path("production/", include("apps.production.urls")),
     path("printing-runs/", include("apps.production.printing_run_urls")),
-    path("labourers/", include("apps.labour.urls")),
-    path("seasonal-closings/", include("apps.labour.seasonal_urls")),
-    path("machines/", include("apps.machines.urls")),
-    path("materials/", include("apps.inventory.material_urls")),
-    path("inventory/", include("apps.inventory.urls")),
-    path("assembly/", include("apps.assembly.urls")),
-    path("audits/", include("apps.stock_audit.urls")),
-    path("dispatch/", include("apps.dispatch.urls")),
-    path("surplus/", include("apps.dispatch.surplus_urls")),
 ]
 
 urlpatterns = [

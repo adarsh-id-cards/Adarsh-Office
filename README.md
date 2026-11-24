@@ -2,9 +2,12 @@
 
 **Pro Office** is the internal production and operations management web application for **Adarsh ID Cards**.
 
-This repository contains the complete **Phases 1–5 verified** modular monolith implementation covering authentication & permissions, client & multi-item order management, independent ID card and lanyard production tracking, labourer & physical machine allocation, split lanyard assembly & material issuance, ledger-driven central inventory & physical stock audits, packing/dispatch & surplus pools, and end-of-season recovery.
+This repository branch (`main`) contains the focused **Client, Multi-Item Order, and Production Management** implementation covering authentication & permissions, client directory & profiles, multi-item ID card & lanyard orders, replacement orders, and independent ID card & lanyard printing workflows.
 
-The frontend navigation is organized around **4 primary operational modules** (`Clients`, `Orders`, `Labour`, `Stock`), an action-oriented `Dashboard`, and a secondary `Administration` section (`Users & Roles`, `Activity Logs`, `Settings & Health`).
+> [!NOTE]
+> Central Inventory, Stock Movements, Stock Audits, Labourer Profiles, Machines, and Dispatch modules are isolated on the **`feature/stock-inventory`** branch for upcoming integration.
+
+The frontend navigation is organized around **2 core operational modules** (`Clients`, `Orders`), an action-oriented `Dashboard`, and a secondary `Administration` section (`Users & Roles`, `Activity Logs`, `Settings & Health`).
 
 ---
 
